@@ -1,17 +1,20 @@
 package com.mahmut.retrofitjava.view;
 
 import android.os.Bundle;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mahmut.retrofitjava.R;
+import com.mahmut.retrofitjava.adapter.RecyclerViewAdapter;
 import com.mahmut.retrofitjava.model.CryptoModel;
 import com.mahmut.retrofitjava.service.CryptoAPI;
 
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private String BASE_URL = "https://raw.githubusercontent.com/";
     Retrofit retrofit;
     RecyclerView recyclerView;
+    RecyclerViewAdapter recyclerViewAdapter;
 
 
     @Override
@@ -70,10 +74,16 @@ public class MainActivity extends AppCompatActivity {
                     List<CryptoModel> responseList = response.body();
                     CryptoModels = new ArrayList<>(responseList);
 
+                    recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                    recyclerViewAdapter = new RecyclerViewAdapter(CryptoModels);
+                    recyclerView.setAdapter(recyclerViewAdapter);
+
+
+                    /*
                     for (CryptoModel cryptoModel : CryptoModels){
                         System.out.println(cryptoModel.currency);
                     }
-
+                    */
                 }
 
 
