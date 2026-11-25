@@ -10,13 +10,14 @@
 
 ## Türkçe
 
-Retrofit ile internetten veri çekmeyi öğrenmek için bu küçük Android uygulamasını Java ile yazdım. Uygulama açıldığında GitHub’daki örnek veri dosyasını indirip kripto para sembollerini ve fiyatlarını kaydırılabilir bir listede gösteriyorum. [K21-JSONDataSet — crypto.json](https://github.com/atilsamancioglu/K21-JSONDataSet/blob/master/crypto.json)
+Retrofit ile veri çekmeyi ve RxJava 2 ile isteği yönetmeyi öğrenmek için bu küçük Android uygulamasını Java ile yazdım. Uygulama açıldığında GitHub’daki örnek veri dosyasını indirip kripto para sembollerini ve fiyatlarını kaydırılabilir bir listede gösteriyorum. [K21-JSONDataSet — crypto.json](https://github.com/atilsamancioglu/K21-JSONDataSet/blob/master/crypto.json)
 
 ### Nasıl çalışıyor?
 
-- `CryptoAPI` arayüzünde GET isteğini tanımladım. `MainActivity` açıldığında isteği Retrofit’in `enqueue()` metoduyla asenkron olarak gönderiyorum.
-- Gson ile JSON yanıtındaki `currency` ve `price` alanlarını `CryptoModel` nesnelerine dönüştürüyorum.
-- İstek başarılı olduğunda `RecyclerViewAdapter` ile veriyi `RecyclerView`’a bağlıyorum. Her satırda sembol ve fiyat alt alta yer alıyor. Arka plan renkleri sekiz satırda bir tekrar ediyor.
+- `CryptoAPI` arayüzündeki GET isteği `Observable<List<CryptoModel>>` döndürüyor. Bu dönüş tipini kullanmak için Retrofit’e `RxJava2CallAdapterFactory` ekledim.
+- `MainActivity` açıldığında isteği `Schedulers.io()` ile arka planda çalıştırıyorum. Gson, JSON yanıtındaki `currency` ve `price` alanlarını `CryptoModel` nesnelerine eşliyor.
+- RxAndroid’in `AndroidSchedulers.mainThread()` zamanlayıcısıyla ana iş parçacığına geçip sonucu `RecyclerViewAdapter` ile `RecyclerView`’da gösteriyorum. Her satırda sembol ve fiyat alt alta yer alıyor. Arka plan renkleri sekiz satırda bir tekrar ediyor.
+- `MainActivity` yok edildiğinde `onDestroy()` içinde `CompositeDisposable.clear()` ile aboneliği temizliyorum.
 
 ### Çalıştırma
 
@@ -31,13 +32,14 @@ Retrofit ile internetten veri çekmeyi öğrenmek için bu küçük Android uygu
 
 ## English
 
-I wrote this small Android app in Java to practice fetching data with Retrofit. When the app opens, I fetch a sample dataset from GitHub and display the cryptocurrency symbols and prices in a scrollable list. [K21-JSONDataSet — crypto.json](https://github.com/atilsamancioglu/K21-JSONDataSet/blob/master/crypto.json)
+I wrote this small Android app in Java to practice fetching data with Retrofit and managing the request with RxJava 2. When the app opens, I fetch a sample dataset from GitHub and display the cryptocurrency symbols and prices in a scrollable list. [K21-JSONDataSet — crypto.json](https://github.com/atilsamancioglu/K21-JSONDataSet/blob/master/crypto.json)
 
 ### How it works
 
-- I defined the GET request in the `CryptoAPI` interface. When `MainActivity` opens, I send the request asynchronously using Retrofit’s `enqueue()` method.
-- I use Gson to map the `currency` and `price` fields in the JSON response to `CryptoModel` objects.
-- When the request succeeds, I use `RecyclerViewAdapter` to bind the data to a `RecyclerView`. Each row shows the symbol above the price. The background colors repeat every eight rows.
+- The GET request in `CryptoAPI` returns an `Observable<List<CryptoModel>>`. I added `RxJava2CallAdapterFactory` to Retrofit to support that return type.
+- When `MainActivity` opens, I run the request in the background with `Schedulers.io()`. Gson maps the `currency` and `price` fields in the JSON response to `CryptoModel` objects.
+- I use RxAndroid’s `AndroidSchedulers.mainThread()` to switch to the main thread and display the result in a `RecyclerView` using `RecyclerViewAdapter`. Each row shows the symbol above the price. The background colors repeat every eight rows.
+- When `MainActivity` is destroyed, I call `CompositeDisposable.clear()` in `onDestroy()` to dispose of the subscription.
 
 ### Running the app
 
